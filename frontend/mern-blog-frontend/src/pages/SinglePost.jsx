@@ -9,7 +9,7 @@ export default function SinglePost() {
   useEffect(() => {
     async function fetchPost() {
       try {
-        const res = await fetch(`http://localhost:5000/api/posts/${id}`);
+        const res = await fetch(`https://mern-stack-integration-ngong2.onrender.com/api/posts/${id}`);
         const data = await res.json();
         setPost(data);
       } catch (err) {
@@ -30,7 +30,7 @@ export default function SinglePost() {
 
       {post.image && (
         <img
-          src={`http://localhost:5000${post.image}`}
+          src={`https://mern-stack-integration-ngong2.onrender.com${post.image}`}
           alt={post.title}
           className="w-full h-64 object-cover rounded-lg shadow-md mb-6"
         />

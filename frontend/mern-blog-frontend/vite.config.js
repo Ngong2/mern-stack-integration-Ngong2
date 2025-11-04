@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:5000", // ✅ use HTTP not HTTPS
+        target: "https://mern-stack-integration-ngong2.onrender.com", // ✅ use HTTP not HTTPS
         changeOrigin: true,
         secure: false, // ✅ ignore self-signed HTTPS certs
       },

@@ -65,7 +65,7 @@ export default function Dashboard() {
       status: post.status,
     });
     setFile(null);
-    setPreview(post.image ? `http://localhost:5000${post.image}` : null);
+    setPreview(post.image ? `https://mern-stack-integration-ngong2.onrender.com${post.image}` : null);
   };
 
   const handleCancelEdit = () => {

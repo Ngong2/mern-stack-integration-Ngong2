@@ -8,7 +8,7 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/forgot-password", { email });
+      const res = await axios.post("https://mern-stack-integration-ngong2.onrender.com/api/auth/forgot-password", { email });
       setMessage(res.data.message);
     } catch (err) {
       setMessage("Error sending password reset link. Please try again.");
