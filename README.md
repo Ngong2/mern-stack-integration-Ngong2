@@ -1,78 +1,188 @@
-# MERN Stack Integration Assignment
+# MERN Blog Project
 
-This assignment focuses on building a full-stack MERN (MongoDB, Express.js, React.js, Node.js) application that demonstrates seamless integration between front-end and back-end components.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Assignment Overview
+This repository contains a **full-stack MERN (MongoDB, Express, React, Node.js) blog application** with separate **frontend** and **backend** directories.
 
-You will build a blog application with the following features:
-1. RESTful API with Express.js and MongoDB
-2. React front-end with component architecture
-3. Full CRUD functionality for blog posts
-4. User authentication and authorization
-5. Advanced features like image uploads and comments
+- **Frontend**: React + Vite (see [frontend README](./frontend/mern-blog-frontend/README.md))
+- **Backend**: Node.js + Express + MongoDB (see [backend README](./Backend/README.md))
+
+---
+
+## Table of Contents
+
+- [Project Structure](#project-structure)
+- [Getting Started](#getting-started)
+- [License](#license)
+
+---
 
 ## Project Structure
 
-```
-mern-blog/
-├── client/                 # React front-end
-│   ├── public/             # Static files
-│   ├── src/                # React source code
-│   │   ├── components/     # Reusable components
-│   │   ├── pages/          # Page components
-│   │   ├── hooks/          # Custom React hooks
-│   │   ├── services/       # API services
-│   │   ├── context/        # React context providers
-│   │   └── App.jsx         # Main application component
-│   └── package.json        # Client dependencies
-├── server/                 # Express.js back-end
-│   ├── config/             # Configuration files
-│   ├── controllers/        # Route controllers
-│   ├── models/             # Mongoose models
-│   ├── routes/             # API routes
-│   ├── middleware/         # Custom middleware
-│   ├── utils/              # Utility functions
-│   ├── server.js           # Main server file
-│   └── package.json        # Server dependencies
-└── README.md               # Project documentation
-```
+mern-stack-integration-Ngong2/
+├─ Backend/ # Backend API
+├─ frontend/
+│ └─ mern-blog-frontend/ # Frontend React app
+├─ .gitignore
+└─ README.md
+
+yaml
+Copy code
+
+---
 
 ## Getting Started
 
-1. Accept the GitHub Classroom assignment invitation
-2. Clone your personal repository that was created by GitHub Classroom
-3. Follow the setup instructions in the `Week4-Assignment.md` file
-4. Complete the tasks outlined in the assignment
+For detailed setup and usage instructions:
 
-## Files Included
+- **Frontend**: [frontend README](./frontend/mern-blog-frontend/README.md)  
+- **Backend**: [backend README](./Backend/README.md)
 
-- `Week4-Assignment.md`: Detailed assignment instructions
-- Starter code for both client and server:
-  - Basic project structure
-  - Configuration files
-  - Sample models and components
+---
 
-## Requirements
+## License
 
-- Node.js (v18 or higher)
-- MongoDB (local installation or Atlas account)
-- npm or yarn
-- Git
+This project is licensed under the MIT License.
+2️⃣ Frontend README.md (frontend/mern-blog-frontend/README.md)
+markdown
+Copy code
+# MERN Blog Frontend
 
-## Submission
+This is the **frontend** of the MERN Blog Project, built with **React** and **Vite**.
 
-Your work will be automatically submitted when you push to your GitHub Classroom repository. Make sure to:
+---
 
-1. Complete both the client and server portions of the application
-2. Implement all required API endpoints
-3. Create the necessary React components and hooks
-4. Document your API and setup process in the README.md
-5. Include screenshots of your working application
+## Features
 
-## Resources
+- Responsive UI
+- User authentication (register/login/logout)
+- CRUD for blog posts
+- Search and pagination
+- Axios integration with backend API
 
-- [MongoDB Documentation](https://docs.mongodb.com/)
-- [Express.js Documentation](https://expressjs.com/)
-- [React Documentation](https://react.dev/)
-- [Node.js Documentation](https://nodejs.org/en/docs/)
-- [Mongoose Documentation](https://mongoosejs.com/docs/) 
+---
+
+## Tech Stack
+
+- React
+- Vite
+- React Router
+- Axios
+- CSS / Bootstrap
+
+---
+
+## Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+2. Create environment variables
+Create .env in this folder:
+
+bash
+Copy code
+VITE_API_URL=http://localhost:5000/api
+3. Start development server
+bash
+Copy code
+npm run dev
+The app will run on http://localhost:5173.
+
+Usage
+Open browser and navigate to the app
+
+Register a new user or login
+
+Manage blog posts using the UI
+
+All API requests communicate with the backend
+
+License
+MIT
+
+yaml
+Copy code
+
+---
+
+## **3️⃣ Backend `README.md` (`Backend/README.md`)**
+
+```markdown
+# MERN Blog Backend
+
+This is the **backend** of the MERN Blog Project, built with **Node.js**, **Express**, and **MongoDB**.
+
+---
+
+## Features
+
+- RESTful API for blog posts
+- User authentication with JWT
+- Password hashing with bcryptjs
+- Pagination and search endpoints
+
+---
+
+## Tech Stack
+
+- Node.js
+- Express
+- MongoDB / Mongoose
+- bcryptjs
+- JSON Web Tokens (JWT)
+- dotenv
+
+---
+
+## Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+2. Create environment variables
+Create .env in this folder:
+
+ini
+Copy code
+PORT=5000
+MONGO_URI=<your_mongodb_connection_string>
+JWT_SECRET=<your_jwt_secret>
+3. Start backend server
+bash
+Copy code
+npm run dev
+Server runs on http://localhost:5000.
+
+API Endpoints
+POST /api/auth/register - Register new user
+
+POST /api/auth/login - Login user
+
+GET /api/posts - Get posts
+
+POST /api/posts - Create a post
+
+PUT /api/posts/:id - Update a post
+
+DELETE /api/posts/:id - Delete a post
+
+License
+MIT
+
+yaml
+Copy code
+
+---
+
+✅ **Benefits of this approach:**
+
+1. Frontend and backend can be **cloned and used independently**.  
+2. Root README gives a **clear overview** of the project.  
+3. Clean separation prevents confusion for other developers.  
+
+---
+
+I can also make a **ready-to-copy folder structure with all three READMEs** fully formatted for GitHub, so you just place them in the repo.  
