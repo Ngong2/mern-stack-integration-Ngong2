@@ -19,7 +19,10 @@ connectDB();
 // ✅ Middleware
 app.use(
   cors({
-    origin: 'https://mern-stack-integration-ngong2-1.onrender.com',
+    origin: [
+      'https://mern-stack-integration-ngong2-1.onrender.com', // frontend URL in production
+      'http://localhost:5173' // optional for local development
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
