@@ -1,18 +1,12 @@
 const mongoose = require("mongoose");
 
-const postSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true, trim: true },
-    content: { type: String, required: true }, // use 'content' instead of 'body'
-    category: { type: String, required: true },
-    status: { type: String, enum: ["draft", "published"], default: "draft" },
-    image: { type: String, default: null },
-    author: { type: String, required: true },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { type: String, enum: ["admin", "user"], default: "user" },
+    profileImage: { type: String, default: null },
   },
   {
     timestamps: true, // adds createdAt & updatedAt
@@ -20,6 +14,6 @@ const postSchema = new mongoose.Schema(
 );
 
 // ✅ Prevent OverwriteModelError
-const Post = mongoose.models.Post || mongoose.model("Post", postSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
-module.exports = Post;
+module.exports = User;
