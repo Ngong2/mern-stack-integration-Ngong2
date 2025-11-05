@@ -11,7 +11,7 @@ export default function Dashboard() {
   const [form, setForm] = useState({
     title: "",
     body: "",
-    author: "",
+    author: user?.name || "",
     category: "",
     status: "draft",
   });
@@ -31,15 +31,16 @@ export default function Dashboard() {
     try {
       setLoading(true);
       const data = await getPosts();
-      const posts = Array.isArray(data.posts) ? data.posts : data;
+      const posts = data.posts || data.data || data;
       setUserPosts(posts);
+
       setStats({
         total: posts.length,
         published: posts.filter((p) => p.status === "published").length,
         draft: posts.filter((p) => p.status === "draft").length,
       });
     } catch (err) {
-      console.error("Error loading posts:", err);
+      console.error("❌ Error loading posts:", err);
     } finally {
       setLoading(false);
     }
@@ -65,12 +66,22 @@ export default function Dashboard() {
       status: post.status,
     });
     setFile(null);
-    setPreview(post.image ? `https://mern-stack-integration-ngong2.onrender.com${post.image}` : null);
+    setPreview(
+      post.image
+        ? `https://mern-stack-integration-ngong2.onrender.com${post.image}`
+        : null
+    );
   };
 
   const handleCancelEdit = () => {
     setEditingPost(null);
-    setForm({ title: "", body: "", author: "", category: "", status: "draft" });
+    setForm({
+      title: "",
+      body: "",
+      author: user?.name || "",
+      category: "",
+      status: "draft",
+    });
     setFile(null);
     setPreview(null);
   };
@@ -89,7 +100,7 @@ export default function Dashboard() {
       return alert("Please fill all fields");
 
     const formData = new FormData();
-    for (const key in form) formData.append(key, form[key]);
+    Object.entries(form).forEach(([k, v]) => formData.append(k, v));
     if (file) formData.append("image", file);
 
     try {
@@ -104,8 +115,8 @@ export default function Dashboard() {
       handleCancelEdit();
       loadPosts();
     } catch (err) {
-      console.error("Error saving post:", err);
-      alert("❌ Failed to save post");
+      console.error("❌ Error saving post:", err);
+      alert("Failed to save post");
     } finally {
       setSaving(false);
     }
@@ -113,38 +124,39 @@ export default function Dashboard() {
 
   const formatDateTime = (dateStr) => {
     if (!dateStr) return "N/A";
-    const date = new Date(dateStr);
-    if (isNaN(date)) return "N/A";
-    return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    const d = new Date(dateStr);
+    return isNaN(d) ? "N/A" : `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-8 space-y-10">
+    <div className="container mx-auto px-4 py-8 space-y-10">
       {/* Header */}
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <header className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
         <button
           onClick={handleCancelEdit}
-          className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-lg transition duration-300"
+          className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-lg transition"
         >
           {editingPost ? "Cancel Edit" : "Create Post"}
         </button>
       </header>
 
-      {/* Stats */}
+      {/* Stats Section */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard label="Total Posts" value={stats.total} />
-        <StatCard label="Published" value={stats.published} />
-        <StatCard label="Drafts" value={stats.draft} />
+        <StatCard label="Total Posts" value={stats.total} color="sky" />
+        <StatCard label="Published" value={stats.published} color="green" />
+        <StatCard label="Drafts" value={stats.draft} color="yellow" />
       </section>
 
-      {/* Post Form */}
+      {/* Form Section */}
       <form
         onSubmit={handleSubmit}
         encType="multipart/form-data"
-        className="bg-white p-4 sm:p-6 rounded-xl shadow-md space-y-4 max-w-2xl mx-auto"
+        className="bg-white p-6 rounded-xl shadow-md space-y-4 max-w-2xl mx-auto"
       >
-        <h2 className="text-lg font-semibold text-gray-800">{editingPost ? "Edit Post" : "Create Post"}</h2>
+        <h2 className="text-lg font-semibold text-gray-800 text-center">
+          {editingPost ? "Edit Post" : "Create New Post"}
+        </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <input
@@ -152,26 +164,25 @@ export default function Dashboard() {
             placeholder="Title"
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-sky-400"
+            className="border rounded-md p-2 w-full focus:ring-2 focus:ring-sky-400"
           />
           <input
             type="text"
             placeholder="Author"
             value={form.author}
             onChange={(e) => setForm({ ...form, author: e.target.value })}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-sky-400"
+            className="border rounded-md p-2 w-full focus:ring-2 focus:ring-sky-400"
           />
         </div>
 
         <select
           value={form.category}
           onChange={(e) => setForm({ ...form, category: e.target.value })}
-          className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-sky-400"
-          required
+          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-sky-400"
         >
           <option value="">Select Category</option>
-          {categories.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
+          {categories.map((c) => (
+            <option key={c}>{c}</option>
           ))}
         </select>
 
@@ -180,14 +191,14 @@ export default function Dashboard() {
           placeholder="Body"
           value={form.body}
           onChange={(e) => setForm({ ...form, body: e.target.value })}
-          className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-sky-400"
+          className="border rounded-md p-2 w-full focus:ring-2 focus:ring-sky-400"
         ></textarea>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <select
             value={form.status}
             onChange={(e) => setForm({ ...form, status: e.target.value })}
-            className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-sky-400"
+            className="border rounded-md p-2 w-full focus:ring-2 focus:ring-sky-400"
           >
             <option value="draft">Draft</option>
             <option value="published">Published</option>
@@ -197,7 +208,7 @@ export default function Dashboard() {
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="w-full border border-gray-300 rounded-md p-2"
+            className="border rounded-md p-2 w-full"
           />
         </div>
 
@@ -212,41 +223,45 @@ export default function Dashboard() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full sm:w-auto bg-sky-500 hover:bg-sky-600 text-white px-5 py-2 rounded-lg transition duration-300"
+          className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-2 rounded-lg w-full transition"
         >
           {saving ? "Saving..." : editingPost ? "Update Post" : "Create Post"}
         </button>
       </form>
 
-      {/* Posts List */}
+      {/* Posts Section */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-800 mt-8 mb-4">Your Posts</h2>
+        <h2 className="text-lg font-semibold mt-8 mb-4 text-gray-800 text-center">
+          Your Posts
+        </h2>
         {loading ? (
-          <p>Loading...</p>
+          <p className="text-center">Loading...</p>
         ) : userPosts.length === 0 ? (
-          <p className="text-gray-500">No posts found.</p>
+          <p className="text-gray-500 text-center">No posts found.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {userPosts.map((post) => (
               <div
                 key={post._id}
-                className="bg-white rounded-xl shadow hover:shadow-lg overflow-hidden transition-all duration-300"
+                className="bg-white rounded-xl shadow hover:shadow-lg overflow-hidden transition"
               >
                 {post.image && (
                   <img
-                    src={`https://mern-stack-integration-ngong2.onrender.comg${post.image}`}
+                    src={
+                      post.image.startsWith("http")
+                        ? post.image
+                        : `https://mern-stack-integration-ngong2.onrender.com${post.image}`
+                    }
                     alt={post.title}
-                    className="w-full h-56 sm:h-64 md:h-72 object-cover rounded-t-xl"
+                    className="w-full h-56 sm:h-60 object-cover rounded-t-xl"
                   />
                 )}
-                <div className="p-4 space-y-2">
-                  <h3 className="text-lg font-semibold text-gray-800">{post.title}</h3>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold">{post.title}</h3>
                   <p className="text-sm text-gray-500">👤 {post.author}</p>
                   <p className="text-sm text-gray-500">🏷️ {post.category}</p>
-                  <p className="text-sm text-gray-500">🕒 Created: {formatDateTime(post.createdAt)}</p>
-                  <p className="text-sm text-gray-500">🕒 Updated: {formatDateTime(post.updatedAt || post.createdAt)}</p>
-
-                  <p className="text-gray-600 text-sm line-clamp-3">{post.body}</p>
+                  <p className="text-sm text-gray-500">🕒 {formatDateTime(post.createdAt)}</p>
+                  <p className="text-gray-600 text-sm mt-2 line-clamp-3">{post.body}</p>
 
                   <div className="flex justify-between items-center mt-4">
                     <span
@@ -259,10 +274,16 @@ export default function Dashboard() {
                       {post.status}
                     </span>
                     <div className="flex gap-3">
-                      <button onClick={() => handleEdit(post)} className="text-sky-600 hover:underline text-sm">
+                      <button
+                        onClick={() => handleEdit(post)}
+                        className="text-sky-600 hover:underline text-sm"
+                      >
                         Edit
                       </button>
-                      <button onClick={() => handleDelete(post._id)} className="text-red-600 hover:underline text-sm">
+                      <button
+                        onClick={() => handleDelete(post._id)}
+                        className="text-red-600 hover:underline text-sm"
+                      >
                         Delete
                       </button>
                     </div>
@@ -277,9 +298,39 @@ export default function Dashboard() {
   );
 }
 
-const StatCard = ({ label, value }) => (
-  <div className="bg-white p-4 sm:p-6 rounded-xl shadow text-center hover:shadow-md transition">
-    <div className="text-sm text-gray-500">{label}</div>
-    <div className="text-2xl font-bold text-gray-800">{value}</div>
-  </div>
-);
+/* ===========================
+   ✅ Animated StatCard Component
+   =========================== */
+const StatCard = ({ label, value, color }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    const duration = 1000; // 1 second
+    const stepTime = Math.max(Math.floor(duration / value || 1), 20);
+
+    const timer = setInterval(() => {
+      start += 1;
+      setDisplayValue(start);
+      if (start >= value) clearInterval(timer);
+    }, stepTime);
+
+    return () => clearInterval(timer);
+  }, [value]);
+
+  const colorClass =
+    color === "green"
+      ? "border-green-400 text-green-600"
+      : color === "yellow"
+      ? "border-yellow-400 text-yellow-600"
+      : "border-sky-400 text-sky-600";
+
+  return (
+    <div
+      className={`bg-white border-2 ${colorClass} p-6 rounded-xl shadow text-center hover:shadow-md transition transform hover:scale-105`}
+    >
+      <div className="text-sm text-gray-500">{label}</div>
+      <div className="text-3xl font-bold mt-2">{displayValue}</div>
+    </div>
+  );
+};
