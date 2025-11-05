@@ -1,3 +1,4 @@
+// controllers/postsController.js
 const Post = require('../models/Post');
 const fs = require('fs');
 const path = require('path');
@@ -17,7 +18,7 @@ exports.createPost = async (req, res) => {
       author,
       category,
       status: status || 'draft',
-      user: req.user._id, // associate post with logged-in user
+      user: req.user._id,
       image: req.file ? `/uploads/${req.file.filename}` : null,
     });
 
@@ -33,13 +34,13 @@ exports.createPost = async (req, res) => {
 exports.getPosts = async (req, res) => {
   try {
     const posts = await Post.find({ user: req.user._id }).sort({ createdAt: -1 });
-    res.json(posts);
+    res.json({ posts });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
-// ✅ Get Single Post (only if owned by current user)
+// ✅ Get Single Post
 exports.getPost = async (req, res) => {
   try {
     const post = await Post.findOne({ _id: req.params.id, user: req.user._id });
@@ -50,7 +51,7 @@ exports.getPost = async (req, res) => {
   }
 };
 
-// ✅ Update Post (only if owned by current user)
+// ✅ Update Post
 exports.updatePost = async (req, res) => {
   try {
     const { title, body, author, category, status } = req.body;
@@ -80,7 +81,7 @@ exports.updatePost = async (req, res) => {
   }
 };
 
-// ✅ Delete Post (only if owned by current user)
+// ✅ Delete Post
 exports.deletePost = async (req, res) => {
   try {
     const post = await Post.findOne({ _id: req.params.id, user: req.user._id });
@@ -97,4 +98,3 @@ exports.deletePost = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
-// ✅ Get All Published Posts (for public viewing)
