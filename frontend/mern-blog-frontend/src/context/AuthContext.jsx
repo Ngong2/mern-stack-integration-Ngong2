@@ -36,7 +36,6 @@ export const AuthProvider = ({ children }) => {
     if (!email || !password) throw new Error("Email and password are required");
     const res = await api.login({ email, password });
 
-    // ✅ Save token from backend response
     if (res.token) localStorage.setItem("token", res.token);
     await loadMe();
     return res;
