@@ -10,7 +10,13 @@ export default function Home() {
     async function loadPosts() {
       try {
         const data = await getPosts();
-        const published = data.filter((p) => p.status === "published");
+        
+        // ✅ Handle both array and object response
+        const postsArray = Array.isArray(data) 
+          ? data 
+          : data.posts || data.data || [];
+          
+        const published = postsArray.filter((p) => p.status === "published");
         setPosts(published);
       } catch (err) {
         console.error("Error loading posts:", err);
@@ -28,9 +34,9 @@ export default function Home() {
       </h1>
 
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-center text-gray-500">Loading posts...</p>
       ) : posts.length === 0 ? (
-        <p className="text-gray-500">No published posts available.</p>
+        <p className="text-gray-500 text-center">No published posts available.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => (
@@ -40,14 +46,22 @@ export default function Home() {
             >
               {post.image && (
                 <img
-                  src={`https://mern-stack-integration-ngong2.onrender.com${post.image}`}
+                  src={
+                    post.image.startsWith("http")
+                      ? post.image
+                      : `https://mern-stack-integration-ngong2.onrender.com${
+                          post.image.startsWith("/") ? post.image : `/${post.image}`
+                        }`
+                  }
                   alt={post.title}
                   className="w-full h-48 object-cover"
                 />
               )}
               <div className="p-4 space-y-2 text-left">
                 <h3 className="text-xl font-semibold text-gray-800">{post.title}</h3>
-                <p className="text-sm text-gray-500">By {post.author} • {post.category}</p>
+                <p className="text-sm text-gray-500">
+                  By {post.author} • {post.category}
+                </p>
                 <p className="text-gray-600 line-clamp-3">{post.body}</p>
                 <Link
                   to={`/posts/${post._id}`}
