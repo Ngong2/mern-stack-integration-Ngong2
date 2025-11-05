@@ -3,6 +3,16 @@ const Post = require('../models/Post');
 const fs = require('fs');
 const path = require('path');
 
+// ✅ Get All Posts (for all users - remove user filter)
+exports.getPosts = async (req, res) => {
+  try {
+    const posts = await Post.find().sort({ createdAt: -1 }); // Remove user filter
+    res.json(posts); // Return array directly, not object
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
 // ✅ Create Post
 exports.createPost = async (req, res) => {
   try {
@@ -30,20 +40,10 @@ exports.createPost = async (req, res) => {
   }
 };
 
-// ✅ Get All Posts (only current user's posts)
-exports.getPosts = async (req, res) => {
-  try {
-    const posts = await Post.find({ user: req.user._id }).sort({ createdAt: -1 });
-    res.json({ posts });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-};
-
 // ✅ Get Single Post
 exports.getPost = async (req, res) => {
   try {
-    const post = await Post.findOne({ _id: req.params.id, user: req.user._id });
+    const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
     res.json(post);
   } catch (err) {
@@ -55,9 +55,14 @@ exports.getPost = async (req, res) => {
 exports.updatePost = async (req, res) => {
   try {
     const { title, body, author, category, status } = req.body;
-    const post = await Post.findOne({ _id: req.params.id, user: req.user._id });
+    const post = await Post.findById(req.params.id);
 
     if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    // Check if user owns the post
+    if (post.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to update this post' });
+    }
 
     post.title = title || post.title;
     post.body = body || post.body;
@@ -84,8 +89,13 @@ exports.updatePost = async (req, res) => {
 // ✅ Delete Post
 exports.deletePost = async (req, res) => {
   try {
-    const post = await Post.findOne({ _id: req.params.id, user: req.user._id });
+    const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    // Check if user owns the post
+    if (post.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to delete this post' });
+    }
 
     if (post.image) {
       const imagePath = path.join(__dirname, '..', post.image);
