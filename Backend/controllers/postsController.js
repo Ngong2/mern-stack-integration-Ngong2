@@ -6,9 +6,17 @@ const path = require('path');
 // ✅ Get All Posts (PUBLIC - no auth required)
 exports.getPosts = async (req, res) => {
   try {
+    console.log('🎯 GET /posts endpoint called');
+    console.log('🔑 Auth header:', req.headers.authorization);
+    console.log('👤 User from request:', req.user);
+    
     const posts = await Post.find().sort({ createdAt: -1 });
+    console.log(`📚 Found ${posts.length} total posts`);
+    
+    // Return all posts (frontend will filter published ones)
     res.json(posts);
   } catch (err) {
+    console.error('❌ Error in getPosts:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
