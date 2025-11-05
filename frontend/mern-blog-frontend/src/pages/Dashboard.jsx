@@ -34,12 +34,10 @@ export default function Dashboard() {
       setLoading(true);
       const data = await getPosts();
 
-      // ✅ Handle both array or object
       const posts = Array.isArray(data)
         ? data
         : data.posts || data.data || [];
 
-      // ✅ Filter by logged-in user
       const myPosts = posts.filter(
         (p) => p.author?.toLowerCase() === user?.name?.toLowerCase()
       );
@@ -82,7 +80,7 @@ export default function Dashboard() {
     setFile(null);
     setPreview(
       post.image
-        ? `https://mern-stack-integration-ngong2.onrender.com${post.image.startsWith("/") ? post.image : `/${post.image}`}`
+        ? `https://mern-stack-integration-ngong2.onrender.com${post.image}`
         : null
     );
   };
@@ -146,7 +144,6 @@ export default function Dashboard() {
     <div className="container mx-auto px-4 py-8 space-y-10">
       <ToastContainer position="top-right" autoClose={2500} />
 
-      {/* Header */}
       <header className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
         <button
@@ -157,14 +154,12 @@ export default function Dashboard() {
         </button>
       </header>
 
-      {/* Stats Section */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard label="Total Posts" value={stats.total} color="sky" />
         <StatCard label="Published" value={stats.published} color="green" />
         <StatCard label="Drafts" value={stats.draft} color="yellow" />
       </section>
 
-      {/* Form Section */}
       <form
         onSubmit={handleSubmit}
         encType="multipart/form-data"
@@ -245,7 +240,6 @@ export default function Dashboard() {
         </button>
       </form>
 
-      {/* Posts Section */}
       <section>
         <h2 className="text-lg font-semibold mt-8 mb-4 text-gray-800 text-center">
           Your Posts
@@ -266,10 +260,14 @@ export default function Dashboard() {
                     src={
                       post.image.startsWith("http")
                         ? post.image
-                        : `https://mern-stack-integration-ngong2.onrender.com${post.image.startsWith("/") ? post.image : `/${post.image}`}`
+                        : `https://mern-stack-integration-ngong2.onrender.com${post.image}`
                     }
                     alt={post.title}
                     className="w-full h-56 sm:h-60 object-cover rounded-t-xl"
+                    onError={(e) => {
+                      console.log('❌ Image failed to load:', post.image);
+                      e.target.style.display = 'none';
+                    }}
                   />
                 )}
                 <div className="p-4">
@@ -314,9 +312,6 @@ export default function Dashboard() {
   );
 }
 
-/* ===========================
-   ✅ Animated StatCard Component
-   =========================== */
 const StatCard = ({ label, value, color }) => {
   const [displayValue, setDisplayValue] = useState(0);
 

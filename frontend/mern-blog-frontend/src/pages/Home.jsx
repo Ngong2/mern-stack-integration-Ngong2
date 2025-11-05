@@ -59,12 +59,14 @@ export default function Home() {
                   src={
                     post.image.startsWith("http")
                       ? post.image
-                      : `https://mern-stack-integration-ngong2.onrender.com${
-                          post.image.startsWith("/") ? post.image : `/${post.image}`
-                        }`
+                      : `https://mern-stack-integration-ngong2.onrender.com${post.image}`
                   }
                   alt={post.title}
                   className="w-full h-48 object-cover"
+                  onError={(e) => {
+                    console.log('❌ Image failed to load:', post.image);
+                    e.target.style.display = 'none';
+                  }}
                 />
               )}
               <div className="p-4 space-y-2 text-left">
