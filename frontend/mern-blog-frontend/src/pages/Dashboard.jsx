@@ -234,7 +234,7 @@ export default function Dashboard() {
               >
                 {post.image && (
                   <img
-                    src={`http://localhost:5000${post.image}`}
+                    src={`https://mern-stack-integration-ngong2.onrender.comg${post.image}`}
                     alt={post.title}
                     className="w-full h-56 sm:h-64 md:h-72 object-cover rounded-t-xl"
                   />
