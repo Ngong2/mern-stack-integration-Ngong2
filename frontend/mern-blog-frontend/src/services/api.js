@@ -8,13 +8,24 @@ const API_BASE =
 // ✅ Create a reusable Axios instance
 const API = axios.create({
   baseURL: API_BASE,
-  withCredentials: true, // allows cookie-based auth
+  withCredentials: true,
 });
 
-// ✅ Automatically attach token to every request
+// ✅ Only attach token for protected routes, not public ones
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  
+  // Only attach token to protected routes (not GET posts)
+  const isProtectedRoute = 
+    config.url?.includes('/auth/me') ||
+    config.method === 'post' || 
+    config.method === 'put' || 
+    config.method === 'delete';
+  
+  if (token && isProtectedRoute) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  
   return config;
 });
 
