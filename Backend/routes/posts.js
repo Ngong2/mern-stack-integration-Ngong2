@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const upload = require('../middleware/uploadMiddleware');
-const auth = require('../middleware/authMiddleware'); // ✅ FIXED
+const auth = require('../middleware/authMiddleware');
+
 const {
   createPost,
   getPosts,
@@ -10,19 +11,13 @@ const {
   deletePost
 } = require('../controllers/postsController');
 
-// Get all posts for the logged-in user
-router.get('/', auth, getPosts);
+// PUBLIC ROUTES - NO AUTH
+router.get('/', getPosts);
+router.get('/:id', getPost);
 
-// Get single post for the logged-in user
-router.get('/:id', auth, getPost);
-
-// Create a new post (with image upload)
+// PROTECTED ROUTES - REQUIRE AUTH
 router.post('/', auth, upload.single('image'), createPost);
-
-// Update a post (with image upload)
 router.put('/:id', auth, upload.single('image'), updatePost);
-
-// Delete a post
 router.delete('/:id', auth, deletePost);
 
 module.exports = router;

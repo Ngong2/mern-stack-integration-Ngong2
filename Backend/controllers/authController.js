@@ -14,7 +14,7 @@ const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 // ✅ Register
@@ -87,7 +87,7 @@ exports.forgotPassword = async (req, res) => {
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
     user.resetToken = hashedToken;
-    user.resetTokenExpires = Date.now() + 3600000; // 1 hour
+    user.resetTokenExpires = Date.now() + 3600000;
     await user.save();
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;

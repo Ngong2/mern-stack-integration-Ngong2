@@ -13,7 +13,6 @@ export default function Home() {
         const data = await getPosts();
         console.log("📦 API Response:", data);
         
-        // ✅ Handle both array and object response
         const postsArray = Array.isArray(data) 
           ? data 
           : data.posts || data.data || [];

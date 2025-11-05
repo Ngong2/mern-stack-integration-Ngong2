@@ -1,24 +1,23 @@
-// routes/posts.js - REPLACE WITH THIS EXACT CODE
 const express = require('express');
 const router = express.Router();
-const upload = require('../middleware/uploadMiddleware');
+const {
+  register,
+  login,
+  logout,
+  getMe,
+  forgotPassword,
+  resetPassword
+} = require('../controllers/authController');
 const auth = require('../middleware/authMiddleware');
 
-const {
-  createPost,
-  getPosts,
-  getPost,
-  updatePost,
-  deletePost
-} = require('../controllers/postsController');
+// Public routes
+router.post('/register', register);
+router.post('/login', login);
+router.post('/logout', logout);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
 
-// 🚨 CRITICAL: NO auth middleware here - PUBLIC ROUTES
-router.get('/', getPosts);
-router.get('/:id', getPost);
-
-// PROTECTED ROUTES - require authentication
-router.post('/', auth, upload.single('image'), createPost);
-router.put('/:id', auth, upload.single('image'), updatePost);
-router.delete('/:id', auth, deletePost);
+// Protected route
+router.get('/me', auth, getMe);
 
 module.exports = router;
