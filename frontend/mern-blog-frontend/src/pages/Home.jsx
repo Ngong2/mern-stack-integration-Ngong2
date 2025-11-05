@@ -9,17 +9,23 @@ export default function Home() {
   useEffect(() => {
     async function loadPosts() {
       try {
+        console.log("🔄 Fetching posts...");
         const data = await getPosts();
+        console.log("📦 API Response:", data);
         
         // ✅ Handle both array and object response
         const postsArray = Array.isArray(data) 
           ? data 
           : data.posts || data.data || [];
-          
+        
+        console.log("📊 All posts:", postsArray);
+        
         const published = postsArray.filter((p) => p.status === "published");
+        console.log("✅ Published posts:", published);
+        
         setPosts(published);
       } catch (err) {
-        console.error("Error loading posts:", err);
+        console.error("❌ Error loading posts:", err);
       } finally {
         setLoading(false);
       }
@@ -36,7 +42,12 @@ export default function Home() {
       {loading ? (
         <p className="text-center text-gray-500">Loading posts...</p>
       ) : posts.length === 0 ? (
-        <p className="text-gray-500 text-center">No published posts available.</p>
+        <div className="text-center">
+          <p className="text-gray-500 mb-4">No published posts available.</p>
+          <p className="text-sm text-gray-400">
+            Debug: Check browser console for API response details
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post) => (
