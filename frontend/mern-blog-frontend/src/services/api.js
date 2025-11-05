@@ -5,76 +5,77 @@ const API_BASE =
   import.meta.env.VITE_API_URL ||
   "https://mern-stack-integration-ngong2.onrender.com/api";
 
-// ✅ Create a reusable Axios instance
-const API = axios.create({
+// ✅ PUBLIC API - No credentials for public routes
+const publicAPI = axios.create({
+  baseURL: API_BASE,
+  // NO withCredentials for public routes
+});
+
+// ✅ PRIVATE API - With credentials for protected routes
+const privateAPI = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
 });
 
-// ✅ Only attach token for protected routes, not public ones
-API.interceptors.request.use((config) => {
+// ✅ Add auth token only to private API
+privateAPI.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  
-  // Only attach token to protected routes (not GET posts)
-  const isProtectedRoute = 
-    config.url?.includes('/auth/me') ||
-    config.method === 'post' || 
-    config.method === 'put' || 
-    config.method === 'delete';
-  
-  if (token && isProtectedRoute) {
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  
   return config;
 });
 
 // ==========================
-// 🔐 AUTH ENDPOINTS
+// 🔐 AUTH ENDPOINTS (PROTECTED)
 // ==========================
 export const register = (payload) =>
-  API.post("/auth/register", payload).then((res) => res.data);
+  privateAPI.post("/auth/register", payload).then((res) => res.data);
 
 export const login = (payload) =>
-  API.post("/auth/login", payload).then((res) => res.data);
+  privateAPI.post("/auth/login", payload).then((res) => res.data);
 
 export const logout = () =>
-  API.post("/auth/logout").then((res) => res.data);
+  privateAPI.post("/auth/logout").then((res) => res.data);
 
 export const getMe = () =>
-  API.get("/auth/me").then((res) => res.data);
+  privateAPI.get("/auth/me").then((res) => res.data);
 
 export const forgotPassword = (email) =>
-  API.post("/auth/forgot-password", { email }).then((res) => res.data);
+  privateAPI.post("/auth/forgot-password", { email }).then((res) => res.data);
 
 export const resetPassword = (token, password) =>
-  API.post(`/auth/reset-password/${token}`, { password }).then((res) => res.data);
+  privateAPI.post(`/auth/reset-password/${token}`, { password }).then((res) => res.data);
 
 // ==========================
 // 📝 POSTS ENDPOINTS
 // ==========================
+
+// ✅ PUBLIC POST ROUTES (No auth required)
 export const getPosts = (page = 1, search = "", category = "") =>
-  API.get(`/posts?page=${page}&search=${search}&category=${category}`)
+  publicAPI.get(`/posts?page=${page}&search=${search}&category=${category}`)
     .then((res) => res.data);
 
 export const getPost = (id) =>
-  API.get(`/posts/${id}`).then((res) => res.data);
+  publicAPI.get(`/posts/${id}`).then((res) => res.data);
 
+export const getCategories = () =>
+  publicAPI.get("/categories").then((res) => res.data);
+
+// ✅ PROTECTED POST ROUTES (Auth required)
 export const createPost = (formData) =>
-  API.post("/posts", formData, {
+  privateAPI.post("/posts", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   }).then((res) => res.data);
 
 export const updatePost = (id, formData) =>
-  API.put(`/posts/${id}`, formData, {
+  privateAPI.put(`/posts/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   }).then((res) => res.data);
 
 export const deletePost = (id) =>
-  API.delete(`/posts/${id}`).then((res) => res.data);
+  privateAPI.delete(`/posts/${id}`).then((res) => res.data);
 
-export const getCategories = () =>
-  API.get("/categories").then((res) => res.data);
-
-// ✅ Export default API instance for flexibility
-export default API;
+// ✅ Export instances for flexibility
+export { publicAPI, privateAPI };
+export default privateAPI;
