@@ -3,17 +3,28 @@ const Post = require('../models/Post');
 const fs = require('fs');
 const path = require('path');
 
-// ✅ Get All Posts (for all users - remove user filter)
+// ✅ Get All Posts (PUBLIC - no auth required)
 exports.getPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 }); // Remove user filter
-    res.json(posts); // Return array directly, not object
+    const posts = await Post.find().sort({ createdAt: -1 });
+    res.json(posts);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
-// ✅ Create Post
+// ✅ Get Single Post (PUBLIC - no auth required)
+exports.getPost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+    res.json(post);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// ✅ Create Post (PROTECTED)
 exports.createPost = async (req, res) => {
   try {
     const { title, body, author, category, status } = req.body;
@@ -40,18 +51,7 @@ exports.createPost = async (req, res) => {
   }
 };
 
-// ✅ Get Single Post
-exports.getPost = async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    if (!post) return res.status(404).json({ message: 'Post not found' });
-    res.json(post);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-};
-
-// ✅ Update Post
+// ✅ Update Post (PROTECTED)
 exports.updatePost = async (req, res) => {
   try {
     const { title, body, author, category, status } = req.body;
@@ -86,7 +86,7 @@ exports.updatePost = async (req, res) => {
   }
 };
 
-// ✅ Delete Post
+// ✅ Delete Post (PROTECTED)
 exports.deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
