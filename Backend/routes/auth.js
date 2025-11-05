@@ -1,8 +1,8 @@
-// routes/posts.js
+// routes/posts.js - MAKE SURE THIS IS CORRECT
 const express = require('express');
 const router = express.Router();
 const upload = require('../middleware/uploadMiddleware');
-const auth = require('../middleware/authMiddleware');
+const auth = require('../middleware/authMiddleware'); // Make sure this is imported
 
 const {
   createPost,
@@ -12,11 +12,11 @@ const {
   deletePost
 } = require('../controllers/postsController');
 
-// ✅ Public routes (no auth required)
-router.get('/', getPosts); // Remove auth middleware
-router.get('/:id', getPost); // Remove auth middleware
+// 🚨 IMPORTANT: NO auth middleware on GET routes
+router.get('/', getPosts);
+router.get('/:id', getPost);
 
-// ✅ Protected routes (require authentication)
+// These routes NEED auth
 router.post('/', auth, upload.single('image'), createPost);
 router.put('/:id', auth, upload.single('image'), updatePost);
 router.delete('/:id', auth, deletePost);
