@@ -1,13 +1,24 @@
+// routes/posts.js
 const express = require('express');
 const router = express.Router();
-const { register, login, logout, getMe, forgotPassword, resetPassword } = require('../controllers/authController');
+const upload = require('../middleware/uploadMiddleware');
 const auth = require('../middleware/authMiddleware');
 
-router.post('/register', register);
-router.post('/login', login);
-router.post('/logout', logout);
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password/:token', resetPassword);
-router.get('/me', auth, getMe);
+const {
+  createPost,
+  getPosts,
+  getPost,
+  updatePost,
+  deletePost
+} = require('../controllers/postsController');
+
+// ✅ Public routes (no auth required)
+router.get('/', getPosts); // Remove auth middleware
+router.get('/:id', getPost); // Remove auth middleware
+
+// ✅ Protected routes (require authentication)
+router.post('/', auth, upload.single('image'), createPost);
+router.put('/:id', auth, upload.single('image'), updatePost);
+router.delete('/:id', auth, deletePost);
 
 module.exports = router;
