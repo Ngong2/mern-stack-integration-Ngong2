@@ -15,6 +15,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import { useAuth } from './context/AuthContext';
 import SinglePost from "./pages/SinglePost";
+import { Toaster } from "react-hot-toast";
 
 
 function ProtectedRoute({ children }) {

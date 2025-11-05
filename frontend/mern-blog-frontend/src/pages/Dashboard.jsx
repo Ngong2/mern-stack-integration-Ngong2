@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getPosts, deletePost, createPost, updatePost } from "../services/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -31,16 +33,26 @@ export default function Dashboard() {
     try {
       setLoading(true);
       const data = await getPosts();
-      const posts = data.posts || data.data || data;
-      setUserPosts(posts);
 
+      // ✅ Handle both array or object
+      const posts = Array.isArray(data)
+        ? data
+        : data.posts || data.data || [];
+
+      // ✅ Filter by logged-in user
+      const myPosts = posts.filter(
+        (p) => p.author?.toLowerCase() === user?.name?.toLowerCase()
+      );
+
+      setUserPosts(myPosts);
       setStats({
-        total: posts.length,
-        published: posts.filter((p) => p.status === "published").length,
-        draft: posts.filter((p) => p.status === "draft").length,
+        total: myPosts.length,
+        published: myPosts.filter((p) => p.status === "published").length,
+        draft: myPosts.filter((p) => p.status === "draft").length,
       });
     } catch (err) {
       console.error("❌ Error loading posts:", err);
+      toast.error("Failed to load posts");
     } finally {
       setLoading(false);
     }
@@ -50,9 +62,11 @@ export default function Dashboard() {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
       await deletePost(id);
+      toast.success("🗑️ Post deleted");
       loadPosts();
     } catch (err) {
       console.error("Error deleting post:", err);
+      toast.error("Failed to delete post");
     }
   };
 
@@ -68,7 +82,7 @@ export default function Dashboard() {
     setFile(null);
     setPreview(
       post.image
-        ? `https://mern-stack-integration-ngong2.onrender.com${post.image}`
+        ? `https://mern-stack-integration-ngong2.onrender.com${post.image.startsWith("/") ? post.image : `/${post.image}`}`
         : null
     );
   };
@@ -97,7 +111,7 @@ export default function Dashboard() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title || !form.body || !form.author || !form.category)
-      return alert("Please fill all fields");
+      return toast.warn("⚠️ Please fill all fields");
 
     const formData = new FormData();
     Object.entries(form).forEach(([k, v]) => formData.append(k, v));
@@ -107,16 +121,16 @@ export default function Dashboard() {
       setSaving(true);
       if (editingPost) {
         await updatePost(editingPost._id, formData);
-        alert("✅ Post updated successfully!");
+        toast.success("✅ Post updated successfully!");
       } else {
         await createPost(formData);
-        alert("✅ Post created successfully!");
+        toast.success("📝 Post created successfully!");
       }
       handleCancelEdit();
       loadPosts();
     } catch (err) {
       console.error("❌ Error saving post:", err);
-      alert("Failed to save post");
+      toast.error("Failed to save post");
     } finally {
       setSaving(false);
     }
@@ -130,6 +144,8 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-10">
+      <ToastContainer position="top-right" autoClose={2500} />
+
       {/* Header */}
       <header className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
@@ -235,7 +251,7 @@ export default function Dashboard() {
           Your Posts
         </h2>
         {loading ? (
-          <p className="text-center">Loading...</p>
+          <p className="text-center text-gray-500">Loading...</p>
         ) : userPosts.length === 0 ? (
           <p className="text-gray-500 text-center">No posts found.</p>
         ) : (
@@ -250,7 +266,7 @@ export default function Dashboard() {
                     src={
                       post.image.startsWith("http")
                         ? post.image
-                        : `https://mern-stack-integration-ngong2.onrender.com${post.image}`
+                        : `https://mern-stack-integration-ngong2.onrender.com${post.image.startsWith("/") ? post.image : `/${post.image}`}`
                     }
                     alt={post.title}
                     className="w-full h-56 sm:h-60 object-cover rounded-t-xl"
@@ -306,8 +322,8 @@ const StatCard = ({ label, value, color }) => {
 
   useEffect(() => {
     let start = 0;
-    const duration = 1000; // 1 second
-    const stepTime = Math.max(Math.floor(duration / value || 1), 20);
+    const duration = 1000;
+    const stepTime = Math.max(Math.floor(duration / (value || 1)), 20);
 
     const timer = setInterval(() => {
       start += 1;
